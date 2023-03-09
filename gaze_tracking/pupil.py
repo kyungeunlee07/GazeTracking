@@ -1,11 +1,10 @@
 import numpy as np
 import cv2
 
-
 class Pupil(object):
     """
-    This class detects the iris of an eye and estimates
-    the position of the pupil
+    This class detects the iris of an eye and estimates the position of the pupil
+    눈의 직경과 동공의 위치를 측정하는 클래스
     """
 
     def __init__(self, eye_frame, threshold):
@@ -35,9 +34,8 @@ class Pupil(object):
         return new_frame
 
     def detect_iris(self, eye_frame):
-        """Detects the iris and estimates the position of the iris by
-        calculating the centroid.
-
+        """Detects the iris and estimates the position of the iris by calculating the centroid.
+            동공을 찾고 무게중심을 계산해서 동공의 위치를 측정한다.
         Arguments:
             eye_frame (numpy.ndarray): Frame containing an eye and nothing else
         """

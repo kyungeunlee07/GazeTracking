@@ -8,9 +8,8 @@ from .calibration import Calibration
 
 class GazeTracking(object):
     """
-    This class tracks the user's gaze.
-    It provides useful information like the position of the eyes
-    and pupils and allows to know if the eyes are open or closed
+    This class tracks the user's gaze. 
+    It provides useful information like the position of the eyes and pupils and allows to know if the eyes are open or closed
     """
 
     def __init__(self):
@@ -19,13 +18,14 @@ class GazeTracking(object):
         self.eye_right = None
         self.calibration = Calibration()
 
-        # _face_detector is used to detect faces
+        # face_detector를 이용해서 화면에서 얼굴을 찾는다. 
         self._face_detector = dlib.get_frontal_face_detector()
 
-        # _predictor is used to get facial landmarks of a given face
+        # shape_predictor를 이용해서 얼굴의 Landmarks를 찍는다.
         cwd = os.path.abspath(os.path.dirname(__file__))
         model_path = os.path.abspath(os.path.join(cwd, "trained_models/shape_predictor_68_face_landmarks.dat"))
         self._predictor = dlib.shape_predictor(model_path)
+
 
     @property
     def pupils_located(self):
@@ -42,12 +42,23 @@ class GazeTracking(object):
     def _analyze(self):
         """Detects the face and initialize Eye objects"""
         frame = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
-        faces = self._face_detector(frame)
+        faces = self._face_detector(frame) #detect faces / faces는 모든 face를 가지고 있는 array
+
+        #for face in faces:    
+            #x = landmarks.part(36).x
+            #y = landmarks.part(36).y
+            #cv2.circle(frame, (x, y), 3, (0, 0, 255), 2)
+        #    print(face)
+        # for face in faces:
+            #x, y = face.left(), face.top()
+            #x1, y1 = face. right(), face.bottom()
+            #cv2.rectangle(frame, (x, y), (x1, y1), (0, 255, 0), 2)
 
         try:
-            landmarks = self._predictor(frame, faces[0])
+            landmarks = self._predictor(frame, faces[0]) # 오른쪽을 1, 왼쪽을 0
             self.eye_left = Eye(frame, landmarks, 0, self.calibration)
             self.eye_right = Eye(frame, landmarks, 1, self.calibration)
+    
 
         except IndexError:
             self.eye_left = None
@@ -55,7 +66,6 @@ class GazeTracking(object):
 
     def refresh(self, frame):
         """Refreshes the frame and analyzes it.
-
         Arguments:
             frame (numpy.ndarray): The frame to analyze
         """
@@ -68,7 +78,7 @@ class GazeTracking(object):
             x = self.eye_left.origin[0] + self.eye_left.pupil.x
             y = self.eye_left.origin[1] + self.eye_left.pupil.y
             return (x, y)
-
+ 
     def pupil_right_coords(self):
         """Returns the coordinates of the right pupil"""
         if self.pupils_located:
@@ -77,9 +87,8 @@ class GazeTracking(object):
             return (x, y)
 
     def horizontal_ratio(self):
-        """Returns a number between 0.0 and 1.0 that indicates the
-        horizontal direction of the gaze. The extreme right is 0.0,
-        the center is 0.5 and the extreme left is 1.0
+        """Returns a number between 0.0 and 1.0 that indicates the horizontal direction of the gaze. The extreme right is 0.0,
+         the center is 0.5 and the extreme left is 1.0
         """
         if self.pupils_located:
             pupil_left = self.eye_left.pupil.x / (self.eye_left.center[0] * 2 - 10)
@@ -87,8 +96,7 @@ class GazeTracking(object):
             return (pupil_left + pupil_right) / 2
 
     def vertical_ratio(self):
-        """Returns a number between 0.0 and 1.0 that indicates the
-        vertical direction of the gaze. The extreme top is 0.0,
+        """Returns a number between 0.0 and 1.0 that indicates the vertical direction of the gaze. The extreme top is 0.0,
         the center is 0.5 and the extreme bottom is 1.0
         """
         if self.pupils_located:
@@ -111,6 +119,7 @@ class GazeTracking(object):
         if self.pupils_located:
             return self.is_right() is not True and self.is_left() is not True
 
+    #blinking ratio가 @이상일 때 blinking이란 문자가 뜸.
     def is_blinking(self):
         """Returns true if the user closes his eyes"""
         if self.pupils_located:

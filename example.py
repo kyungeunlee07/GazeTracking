@@ -1,13 +1,12 @@
 """
 Demonstration of the GazeTracking library.
-Check the README.md for complete documentation.
 """
 
 import cv2
 from gaze_tracking import GazeTracking
 
 gaze = GazeTracking()
-webcam = cv2.VideoCapture(0)
+webcam = cv2.VideoCapture(0) #웹캠이 하나인 경우이므로 인덱스에 0 넣기.
 
 while True:
     # We get a new frame from the webcam
@@ -17,6 +16,8 @@ while True:
     gaze.refresh(frame)
 
     frame = gaze.annotated_frame()
+
+    """ 통합할 때는 뺄 예정 """
     text = ""
 
     if gaze.is_blinking():
@@ -35,9 +36,12 @@ while True:
     cv2.putText(frame, "Left pupil:  " + str(left_pupil), (90, 130), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31), 1)
     cv2.putText(frame, "Right pupil: " + str(right_pupil), (90, 165), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31), 1)
 
-    cv2.imshow("Demo", frame)
+    """여기까지"""
 
-    if cv2.waitKey(1) == 27:
+    cv2.imshow("Gaze_Tracking", frame)
+
+    key = cv2.waitKey(1)
+    if key == 27:
         break
    
 webcam.release()
